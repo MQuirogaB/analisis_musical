@@ -5,20 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Musicalidad para bailarines</title>
 <style>
-  :root { --bg:#faf7f2; --fg:#222; --muted:#6b6b6b; --accent:#b4531f; --card:#fff; --line:#e6dfd3; }
+  :root { --bg:#faf7f2; --fg:#222; --muted:#6b6b6b; --accent:#b4531f; --line:#e6dfd3; }
   * { box-sizing: border-box; }
-  body { margin:0; font:16px/1.55 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
-  header, main { max-width: 860px; margin: 0 auto; padding: 1.2rem; }
+  body { margin:0; font:16px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+  header, main { max-width: 960px; margin: 0 auto; padding: 1.2rem; }
   h1 { margin-bottom:.2rem; } .sub { color:var(--muted); margin-top:0; }
   h2 { color:var(--accent); margin-top:2.2rem; }
-  .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); gap:.8rem; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:.9rem 1rem; }
-  .card h3 { margin:.1rem 0 .3rem; } .card p { margin:0; color:var(--muted); font-size:.95rem; }
-  .card a { color:inherit; text-decoration:none; } .card:hover { border-color:var(--accent); }
+  .hint { color:var(--muted); font-size:.9rem; margin-top:-.4rem; }
+
+  /* Tarjetas que se voltean */
+  .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:1rem; }
+  .flip { perspective:1000px; background:none; border:0; padding:0; cursor:pointer; text-align:left;
+          font:inherit; color:inherit; height:250px; }
+  .flip:focus-visible { outline:3px solid var(--accent); outline-offset:3px; border-radius:16px; }
+  .inner { position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d; }
+  .flip.on .inner { transform:rotateY(180deg); }
+  .face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+          border-radius:16px; padding:1.1rem; display:flex; flex-direction:column; overflow:auto;
+          box-shadow:0 2px 8px rgba(0,0,0,.12); }
+  .front { background:var(--c); color:#fff; align-items:center; justify-content:center; text-align:center; }
+  .front .num { font-size:.8rem; opacity:.8; letter-spacing:.1em; }
+  .front h3 { margin:.3rem 0; font-size:1.5rem; }
+  .front p { margin:0; opacity:.92; font-size:.95rem; }
+  .front .tap { margin-top:1rem; font-size:.75rem; opacity:.75; }
+  .back { background:#fff; border:2px solid var(--c); transform:rotateY(180deg); font-size:.9rem; }
+  .back h4 { margin:0 0 .4rem; color:var(--c); }
+  .back p { margin:.2rem 0 .5rem; }
+  .back b { color:var(--c); }
+  .back a { margin-top:auto; color:var(--c); font-weight:600; font-size:.85rem; }
+
   #timeline { display:flex; height:46px; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#eee; }
   #timeline div { display:flex; align-items:center; justify-content:center; font-size:.75rem; color:#fff; overflow:hidden; white-space:nowrap; }
   .empty { color:var(--muted); font-style:italic; }
   iframe { width:100%; border:0; border-radius:12px; }
+  @media (prefers-reduced-motion: reduce) { .inner { transition:none; } }
 </style>
 </head>
 <body>
@@ -28,6 +48,7 @@
 </header>
 <main>
   <h2>Conceptos</h2>
+  <p class="hint">Toca una tarjeta para ver su definición.</p>
   <div class="grid" id="conceptos"></div>
 
   <h2 id="cancion-titulo">Canción analizada</h2>
@@ -37,18 +58,59 @@
   <p id="aviso" class="empty"></p>
 </main>
 <script>
+// [título, pista corta, definición, cómo reconocerlo, ficha, color]
 const conceptos = [
-  ["Compás","¿Cómo se agrupan los pulsos?","00-base-pulso-y-compas"],
-  ["Anacrusa","Lo que suena antes del primer tiempo fuerte.","01-anacrusa"],
-  ["Síncopa","Acento donde no se espera.","02-sincopa"],
-  ["Frase musical","Idea con principio, desarrollo y cierre.","03-frase-musical"],
-  ["Bloque musical","Agrupación de frases con dirección propia.","04-bloque-musical"],
-  ["Intro","Cómo arranca la canción.","05-intro"],
-  ["Puente","Sección contrastante a mitad de canción.","06-puente"],
-  ["Coda","El cierre final.","07-coda"]
+  ["Compás","¿Cómo se agrupan los pulsos?",
+   "Forma en que se agrupan los pulsos en ciclos que se repiten. En zouk y kizomba lo habitual es el 4/4.",
+   "Marca el pulso con el pie y di «1» cada vez que sientas que vuelve a empezar.",
+   "00-base-pulso-y-compas","#2f6f8f"],
+  ["Anacrusa","Lo que suena antes del 1",
+   "Nota o notas que suenan antes del primer tiempo fuerte: una toma de impulso que aterriza en el 1.",
+   "La voz o un instrumento entra justo antes de lo esperado y el «1» llega después.",
+   "01-anacrusa","#c0562b"],
+  ["Síncopa","Acento donde no se espera",
+   "Acento en un tiempo débil o entre tiempos que se alarga sobre el siguiente fuerte, que queda sin golpe.",
+   "Sientes un empujón o un tirón: la música se adelanta o se queda en el aire.",
+   "02-sincopa","#8a4fb0"],
+  ["Frase musical","Una idea con principio y cierre",
+   "Unidad de sentido con principio, desarrollo y cierre. Suele ocupar 2 o 4 compases.",
+   "La melodía respira: pausa, descenso o nota larga al final.",
+   "03-frase-musical","#2e8b57"],
+  ["Bloque musical","Frases que forman una unidad",
+   "Agrupación de frases con dirección propia: estrofa, estribillo o parte instrumental.",
+   "Cambia algo perceptible: instrumentos, intensidad, silencio o patrón rítmico.",
+   "04-bloque-musical","#c28a00"],
+  ["Intro","Cómo arranca la canción",
+   "Sección que abre la canción antes de la primera parte cantada y presenta ambiente y tempo.",
+   "Suena antes de que entre la voz; puede ser solo ritmo o un instrumento.",
+   "05-intro","#3a7ca5"],
+  ["Puente","El cambio de paisaje",
+   "Sección contrastante, normalmente hacia el final, con material nuevo: otra melodía, ritmo o energía.",
+   "Tras varias repeticiones, algo deja de ser lo mismo. Suele volver al estribillo después.",
+   "06-puente","#b5446e"],
+  ["Coda","El cierre final",
+   "Sección que cierra la canción tras la última repetición del material principal.",
+   "Estribillo variado, ralentización, parada brusca, fade-out o vuelta a la intro.",
+   "07-coda","#555e6b"]
 ];
-document.getElementById('conceptos').innerHTML = conceptos.map(([t,d,f]) =>
-  `<div class="card"><a href="docs/${f}.md"><h3>${t}</h3><p>${d}</p></a></div>`).join('');
+document.getElementById('conceptos').innerHTML = conceptos.map(([t,p,d,r,f,c],i) => `
+  <button class="flip" style="--c:${c}" aria-pressed="false" aria-label="${t}: tocar para voltear">
+    <div class="inner">
+      <div class="face front">
+        <span class="num">${String(i+1).padStart(2,'0')}</span>
+        <h3>${t}</h3><p>${p}</p><span class="tap">toca para voltear ↻</span>
+      </div>
+      <div class="face back">
+        <h4>${t}</h4>
+        <p>${d}</p>
+        <p><b>Cómo reconocerlo:</b> ${r}</p>
+        <a href="docs/${f}.md" onclick="event.stopPropagation()">Ficha completa →</a>
+      </div>
+    </div>
+  </button>`).join('');
+document.querySelectorAll('.flip').forEach(b => b.addEventListener('click', () => {
+  const on = b.classList.toggle('on'); b.setAttribute('aria-pressed', on);
+}));
 
 const colores = {intro:'#6c8ebf', estrofa:'#82a66a', estribillo:'#b4531f', puente:'#8a6bb4', coda:'#555'};
 const mmss = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
