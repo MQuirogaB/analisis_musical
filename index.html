@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Musicalidad para bailarines</title>
+<style>
+  :root { --bg:#faf7f2; --fg:#222; --muted:#6b6b6b; --accent:#b4531f; --card:#fff; --line:#e6dfd3; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.55 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+  header, main { max-width: 860px; margin: 0 auto; padding: 1.2rem; }
+  h1 { margin-bottom:.2rem; } .sub { color:var(--muted); margin-top:0; }
+  h2 { color:var(--accent); margin-top:2.2rem; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); gap:.8rem; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:.9rem 1rem; }
+  .card h3 { margin:.1rem 0 .3rem; } .card p { margin:0; color:var(--muted); font-size:.95rem; }
+  .card a { color:inherit; text-decoration:none; } .card:hover { border-color:var(--accent); }
+  #timeline { display:flex; height:46px; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#eee; }
+  #timeline div { display:flex; align-items:center; justify-content:center; font-size:.75rem; color:#fff; overflow:hidden; white-space:nowrap; }
+  .empty { color:var(--muted); font-style:italic; }
+  iframe { width:100%; border:0; border-radius:12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Musicalidad para bailarines</h1>
+  <p class="sub">Frase, bloque, puente, intro, coda, síncopa y anacrusa.</p>
+</header>
+<main>
+  <h2>Conceptos</h2>
+  <div class="grid" id="conceptos"></div>
+
+  <h2 id="cancion-titulo">Canción analizada</h2>
+  <iframe id="player" height="152" allow="encrypted-media" loading="lazy"></iframe>
+  <p id="meta"></p>
+  <div id="timeline"></div>
+  <p id="aviso" class="empty"></p>
+</main>
+<script>
+const conceptos = [
+  ["Compás","¿Cómo se agrupan los pulsos?","00-base-pulso-y-compas"],
+  ["Anacrusa","Lo que suena antes del primer tiempo fuerte.","01-anacrusa"],
+  ["Síncopa","Acento donde no se espera.","02-sincopa"],
+  ["Frase musical","Idea con principio, desarrollo y cierre.","03-frase-musical"],
+  ["Bloque musical","Agrupación de frases con dirección propia.","04-bloque-musical"],
+  ["Intro","Cómo arranca la canción.","05-intro"],
+  ["Puente","Sección contrastante a mitad de canción.","06-puente"],
+  ["Coda","El cierre final.","07-coda"]
+];
+document.getElementById('conceptos').innerHTML = conceptos.map(([t,d,f]) =>
+  `<div class="card"><a href="docs/${f}.md"><h3>${t}</h3><p>${d}</p></a></div>`).join('');
+
+const colores = {intro:'#6c8ebf', estrofa:'#82a66a', estribillo:'#b4531f', puente:'#8a6bb4', coda:'#555'};
+const mmss = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+
+fetch('data/o-meu-lugar.json').then(r => r.json()).then(d => {
+  document.getElementById('cancion-titulo').textContent = `${d.titulo} — ${d.artista}`;
+  document.getElementById('player').src = `https://open.spotify.com/embed/track/${d.spotify_track_id}`;
+  document.getElementById('meta').textContent =
+    `Duración ${mmss(d.duracion_s)} · BPM ${d.bpm ?? '?'} · Compás ${d.compas ?? '?'}`;
+  const tl = document.getElementById('timeline');
+  if (!d.secciones.length) {
+    tl.style.display = 'none';
+    document.getElementById('aviso').textContent = 'Línea de tiempo pendiente: faltan las secciones verificadas.';
+    return;
+  }
+  tl.innerHTML = d.secciones.map((s,i) => {
+    const fin = (d.secciones[i+1]?.inicio_s) ?? d.duracion_s;
+    const w = (fin - s.inicio_s) / d.duracion_s * 100;
+    const c = colores[s.tipo] || '#999';
+    return `<div style="width:${w}%;background:${c}" title="${s.nombre} (${mmss(s.inicio_s)})">${s.nombre}</div>`;
+  }).join('');
+});
+</script>
+</body>
+</html>
