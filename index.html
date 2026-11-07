@@ -45,6 +45,22 @@
   #ahora { font-weight:600; margin:.5rem 0 0; }
   #tip { position:absolute; top:4px; padding:1px 6px; font-size:.75rem; background:#222; color:#fff;
          border-radius:4px; pointer-events:none; display:none; }
+
+  /* Caja de ritmos */
+  #caja-box { background:#fff; border:1px solid var(--line); border-radius:16px; padding:1.1rem; }
+  #pulsos { display:flex; gap:.7rem; align-items:flex-end; height:150px; }
+  .pulso { flex:1; border-radius:12px; background:#e9e2d4; color:#555; display:flex; flex-direction:column;
+           align-items:center; justify-content:flex-end; padding:.5rem; transition:background .08s, transform .08s, color .08s; }
+  .pulso b { font-size:1.6rem; line-height:1; } .pulso small { font-size:.8rem; margin-top:.2rem; }
+  .pulso.f { height:100%; } .pulso.sf { height:72%; } .pulso.d { height:48%; }
+  .pulso.on { background:#2f6f8f; color:#fff; transform:scale(1.04); }
+  .pulso.f.on { background:#b4531f; }
+  #cr-ctl { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-top:1rem; }
+  #cr-play { font:inherit; font-weight:600; padding:.55rem 1.4rem; border:0; border-radius:999px;
+             background:var(--accent); color:#fff; cursor:pointer; }
+  #cr-play:focus-visible { outline:3px solid #222; outline-offset:2px; }
+  #cr-ctl label { display:flex; gap:.6rem; align-items:center; flex:1; min-width:220px; }
+  #cr-bpm { flex:1; }
   @media (prefers-reduced-motion: reduce) { .inner { transition:none; } }
 </style>
 </head>
@@ -58,6 +74,16 @@
   <p class="hint">Toca una tarjeta para ver su definición.</p>
   <div class="grid" id="conceptos"></div>
 
+  <h2 id="caja">Caja de ritmos · compás 4/4</h2>
+  <p class="hint">Un compás = 4 pulsos. <b>F</b> fuerte · <b>D</b> débil · <b>SF</b> semifuerte. El 1 suena más agudo.</p>
+  <div id="caja-box">
+    <div id="pulsos"></div>
+    <div id="cr-ctl">
+      <button id="cr-play" type="button">▶ Reproducir</button>
+      <label>BPM <input id="cr-bpm" type="range" min="50" max="140" value="90"> <output id="cr-bpm-v">90</output></label>
+    </div>
+  </div>
+
   <h2 id="cancion-titulo">Canciones analizadas</h2>
   <select id="selector" aria-label="Elegir canción" hidden></select>
   <p id="meta"></p>
@@ -68,42 +94,26 @@
   <p class="hint">Haz clic en la onda para saltar a ese punto. Las líneas finas marcan compases; las más marcadas, el límite de cada frase (2 compases).</p>
 </main>
 <script>
-// [título, pista corta, definición, cómo reconocerlo, ficha, color]
+// [título, pista corta, definición, color]
 const conceptos = [
   ["Compás","¿Cómo se agrupan los pulsos?",
-   "Forma en que se agrupan los pulsos en ciclos que se repiten. En zouk y kizomba lo habitual es el 4/4.",
-   "Marca el pulso con el pie y di «1» cada vez que sientas que vuelve a empezar.",
-   "00-base-pulso-y-compas","#2f6f8f"],
+   "Forma en que se agrupan los pulsos en ciclos que se repiten. En zouk y kizomba lo habitual es el 4/4.","#2f6f8f"],
   ["Anacrusa","Lo que suena antes del 1",
-   "Nota o notas que suenan antes del primer tiempo fuerte: una toma de impulso que aterriza en el 1.",
-   "La voz o un instrumento entra justo antes de lo esperado y el «1» llega después.",
-   "01-anacrusa","#c0562b"],
+   "Nota o notas que suenan antes del primer tiempo fuerte: una toma de impulso que aterriza en el 1.","#c0562b"],
   ["Síncopa","Acento donde no se espera",
-   "Acento en un tiempo débil o entre tiempos que se alarga sobre el siguiente fuerte, que queda sin golpe.",
-   "Sientes un empujón o un tirón: la música se adelanta o se queda en el aire.",
-   "02-sincopa","#8a4fb0"],
+   "Acento en un tiempo débil o entre tiempos que se alarga sobre el siguiente fuerte, que queda sin golpe.","#8a4fb0"],
   ["Frase musical","Una idea con principio y cierre",
-   "Unidad de sentido con principio, desarrollo y cierre. Suele ocupar 2 o 4 compases.",
-   "La melodía respira: pausa, descenso o nota larga al final.",
-   "03-frase-musical","#2e8b57"],
+   "Unidad de sentido con principio, desarrollo y cierre. Suele ocupar 2 o 4 compases.","#2e8b57"],
   ["Bloque musical","Frases que forman una unidad",
-   "Agrupación de frases con dirección propia: estrofa, estribillo o parte instrumental.",
-   "Cambia algo perceptible: instrumentos, intensidad, silencio o patrón rítmico.",
-   "04-bloque-musical","#c28a00"],
+   "Agrupación de frases con dirección propia: estrofa, estribillo o parte instrumental.","#c28a00"],
   ["Intro","Cómo arranca la canción",
-   "Sección que abre la canción antes de la primera parte cantada y presenta ambiente y tempo.",
-   "Suena antes de que entre la voz; puede ser solo ritmo o un instrumento.",
-   "05-intro","#3a7ca5"],
+   "Sección que abre la canción antes de la primera parte cantada y presenta ambiente y tempo.","#3a7ca5"],
   ["Puente","El cambio de paisaje",
-   "Sección contrastante, normalmente hacia el final, con material nuevo: otra melodía, ritmo o energía.",
-   "Tras varias repeticiones, algo deja de ser lo mismo. Suele volver al estribillo después.",
-   "06-puente","#b5446e"],
+   "Sección contrastante, normalmente hacia el final, con material nuevo: otra melodía, ritmo o energía.","#b5446e"],
   ["Coda","El cierre final",
-   "Sección que cierra la canción tras la última repetición del material principal.",
-   "Estribillo variado, ralentización, parada brusca, fade-out o vuelta a la intro.",
-   "07-coda","#555e6b"]
+   "Sección que cierra la canción tras la última repetición del material principal.","#555e6b"]
 ];
-document.getElementById('conceptos').innerHTML = conceptos.map(([t,p,d,r,f,c],i) => `
+document.getElementById('conceptos').innerHTML = conceptos.map(([t,p,d,c],i) => `
   <button class="flip" style="--c:${c}" aria-pressed="false" aria-label="${t}: tocar para voltear">
     <div class="inner">
       <div class="face front">
@@ -113,14 +123,45 @@ document.getElementById('conceptos').innerHTML = conceptos.map(([t,p,d,r,f,c],i)
       <div class="face back">
         <h4>${t}</h4>
         <p>${d}</p>
-        <p><b>Cómo reconocerlo:</b> ${r}</p>
-        <a href="docs/${f}.md" onclick="event.stopPropagation()">Ficha completa →</a>
+        ${t === 'Compás' ? '<a href="#caja" onclick="event.stopPropagation()">Probar en la caja de ritmos ↓</a>' : ''}
       </div>
     </div>
   </button>`).join('');
 document.querySelectorAll('.flip').forEach(b => b.addEventListener('click', () => {
   const on = b.classList.toggle('on'); b.setAttribute('aria-pressed', on);
 }));
+
+// ---- Caja de ritmos 4/4 (sonido sintetizado con Web Audio) ----
+(() => {
+  const defs = [['1','Fuerte','F','f'],['2','Débil','D','d'],['3','Semifuerte','SF','sf'],['4','Débil','D','d']];
+  const cont = document.getElementById('pulsos');
+  cont.innerHTML = defs.map(([n,nom,ab,cl]) => `<div class="pulso ${cl}"><b>${n}</b><small>${ab} · ${nom}</small></div>`).join('');
+  const cajas = [...cont.children], btn = document.getElementById('cr-play');
+  const bpmEl = document.getElementById('cr-bpm'), bpmV = document.getElementById('cr-bpm-v');
+  bpmEl.addEventListener('input', () => bpmV.textContent = bpmEl.value);
+  let ac = null, run = false, beat = 0, next = 0, timer = null;
+  const marcar = i => cajas.forEach((c,k) => c.classList.toggle('on', k === i));
+  function clic(t, b) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'triangle'; o.frequency.value = b === 0 ? 1600 : b === 2 ? 1150 : 850;
+    const v = b === 0 ? 0.9 : b === 2 ? 0.6 : 0.4;
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + 0.1);
+  }
+  function plan() {
+    while (next < ac.currentTime + 0.15) {
+      const b = beat; clic(next, b);
+      setTimeout(() => { if (run) marcar(b); }, Math.max(0, (next - ac.currentTime) * 1000));
+      next += 60 / Number(bpmEl.value); beat = (beat + 1) % 4;
+    }
+    timer = setTimeout(plan, 25);
+  }
+  btn.addEventListener('click', () => {
+    if (run) { run = false; clearTimeout(timer); marcar(-1); btn.textContent = '▶ Reproducir'; return; }
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
+    run = true; beat = 0; next = ac.currentTime + 0.05; btn.textContent = '■ Parar'; plan();
+  });
+})();
 
 const colores = {intro:'#6c8ebf', estrofa:'#82a66a', estribillo:'#b4531f', puente:'#8a6bb4', coda:'#2a9d8f'};
 const mmss = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
