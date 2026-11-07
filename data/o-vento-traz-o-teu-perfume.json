@@ -4,11 +4,11 @@
   "duracion_s": 187.22,
   "bpm": 90,
   "compas": "4/4",
-  "duracion_compas_s": 2.666,
+  "duracion_compas_s": 2.6667,
   "audio": "audio/o-vento-traz-o-teu-perfume.mp3",
   "enlace": "https://pixabay.com/es/music/m%C3%BAsica-pop-o-vento-traz-o-teu-perfume-kizomba-music-436764/",
   "credito": "Music by <a href=\"https://pixabay.com/es/users/vjgalaxy-8110364/\" target=\"_blank\" rel=\"noopener\">Alejandro Piñero Amerio</a> from <a href=\"https://pixabay.com/music/\" target=\"_blank\" rel=\"noopener\">Pixabay</a> (Pixabay Content License)",
-  "nota": "Secciones medidas sobre el audio (energía y timbre) y ajustadas por el profesor al oído. Una frase = 2 compases (≈5,3 s). Tiempos con margen de ±0,5 s.",
+  "nota": "Secciones medidas sobre el audio y ajustadas al oído por el profesor. La música empieza a los 0,6 s; los compases se cuentan desde ahí. Una frase = 2 compases (≈5,3 s). Margen ±0,3 s.",
   "secciones": [
     {
       "nombre": "Intro",
@@ -19,51 +19,52 @@
     {
       "nombre": "Bloque A",
       "tipo": "estrofa",
-      "inicio_s": 21.33,
+      "inicio_s": 21.96,
       "frases": 4
     },
     {
-      "nombre": "B · Estribillo",
+      "nombre": "Estribillo",
       "tipo": "estribillo",
-      "inicio_s": 42.66,
+      "inicio_s": 43.3,
       "frases": 4
     },
     {
       "nombre": "Puente 1",
       "tipo": "puente",
-      "inicio_s": 63.98,
+      "inicio_s": 64.63,
       "frases": 2
     },
     {
       "nombre": "Bloque C",
       "tipo": "estrofa",
-      "inicio_s": 74.65,
+      "inicio_s": 75.3,
       "frases": 4
     },
     {
-      "nombre": "B · Estribillo",
+      "nombre": "Estribillo",
       "tipo": "estribillo",
-      "inicio_s": 95.98,
+      "inicio_s": 96.63,
       "frases": 4
     },
     {
       "nombre": "Puente 2",
       "tipo": "puente",
-      "inicio_s": 117.3,
+      "inicio_s": 117.96,
       "frases": 4,
       "nota": "termina con un compás de parada"
     },
     {
-      "nombre": "B · Estribillo final",
+      "nombre": "Estribillo",
       "tipo": "estribillo",
-      "inicio_s": 141.3,
-      "frases": 8
+      "inicio_s": 141.96,
+      "frases": 4
     },
     {
       "nombre": "Coda",
       "tipo": "coda",
-      "inicio_s": 183.95
+      "inicio_s": 163.3
     }
   ],
-  "frase_s": 5.332
+  "frase_s": 5.3333,
+  "origen_s": 0.63
 }
