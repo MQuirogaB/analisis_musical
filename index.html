@@ -62,6 +62,22 @@
              background:var(--c); color:#fff; cursor:pointer; }
   #cr-play:focus-visible { outline:3px solid #222; outline-offset:2px; }
   .cr-info { color:var(--muted); font-size:.85rem; }
+  .sy-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:.5rem; flex:1; min-height:140px; }
+  .paso { border-radius:12px; background:#e9e2d4; color:#555; display:flex; flex-direction:column;
+          align-items:center; justify-content:space-between; padding:.6rem .2rem; transition:background .08s, transform .08s; }
+  .paso .n { font-weight:700; font-size:1.3rem; line-height:1; }
+  .paso.of .n { font-weight:400; font-size:1rem; opacity:.7; }
+  .paso .marca { width:60%; max-width:46px; aspect-ratio:1; border-radius:50%; background:transparent; }
+  .paso.hit .marca { background:#2f6f8f; }
+  .paso.of.hit .marca { background:#8a4fb0; }
+  .paso.ahora { background:#ffe9a8; transform:scale(1.04); }
+  .sy-modo { font:inherit; font-weight:600; padding:.5rem 1.1rem; border:2px solid var(--c); border-radius:999px;
+             background:#fff; color:var(--c); cursor:pointer; }
+  .sy-modo[aria-pressed="true"] { background:var(--c); color:#fff; }
+  .cr-play { font:inherit; font-weight:600; padding:.6rem 1.6rem; border:0; border-radius:999px;
+             background:var(--c); color:#fff; cursor:pointer; margin-left:auto; }
+  #cr-ctl button:focus-visible { outline:3px solid #222; outline-offset:2px; }
+  #sy-info { margin:0; min-height:2.6em; font-size:.95rem; }
   @media (prefers-reduced-motion: reduce) { .inner { transition:none; } }
 </style>
 </head>
@@ -90,7 +106,7 @@ const conceptos = [
   ["Compás","¿Cómo se agrupan los pulsos?",
    "Forma en que se agrupan los pulsos en ciclos que se repiten. En zouk y kizomba lo habitual es el 4/4.","#2f6f8f"],
   ["Anacrusa","Lo que suena antes del 1",
-   "Nota o notas que suenan antes del primer tiempo fuerte: una toma de impulso que aterriza en el 1.","#c0562b"],
+   "Nota, notas o voz que suenan antes del primer tiempo fuerte: una toma de impulso que aterriza en el 1.","#c0562b"],
   ["Síncopa","Acento donde no se espera",
    "Acento en un tiempo débil o entre tiempos que se alarga sobre el siguiente fuerte, que queda sin golpe.","#8a4fb0"],
   ["Frase musical","Una idea con principio y cierre",
@@ -104,8 +120,24 @@ const conceptos = [
   ["Coda","El cierre final",
    "Sección que cierra la canción tras la última repetición del material principal.","#555e6b"]
 ];
+const extras = {
+  'Compás': `<div class="cr" onclick="event.stopPropagation()">
+      <div id="pulsos"></div>
+      <div id="cr-ctl"><button id="cr-play" type="button">▶ Reproducir (90 BPM)</button>
+        <span class="cr-info"><b>F</b> fuerte · <b>D</b> débil · <b>SF</b> semifuerte · el 1 suena más agudo</span></div>
+    </div>`,
+  'Síncopa': `<div class="cr" onclick="event.stopPropagation()">
+      <div id="sy-grid" class="sy-grid"></div>
+      <div id="cr-ctl">
+        <button class="sy-modo" data-m="0" type="button">Sin síncopa</button>
+        <button class="sy-modo" data-m="1" type="button">Con síncopa</button>
+        <button id="sy-play" class="cr-play" type="button">▶ Escuchar (90 BPM)</button>
+      </div>
+      <p id="sy-info" class="cr-info"></p>
+    </div>`
+};
 document.getElementById('conceptos').innerHTML = conceptos.map(([t,p,d,c],i) => `
-  <div class="flip${t === 'Compás' ? ' wide' : ''}" style="--c:${c}" role="button" tabindex="0" aria-pressed="false" aria-label="${t}: tocar para voltear">
+  <div class="flip${extras[t] ? ' wide' : ''}" style="--c:${c}" role="button" tabindex="0" aria-pressed="false" aria-label="${t}: tocar para voltear">
     <div class="inner">
       <div class="face front">
         <span class="num">${String(i+1).padStart(2,'0')}</span>
@@ -114,11 +146,7 @@ document.getElementById('conceptos').innerHTML = conceptos.map(([t,p,d,c],i) => 
       <div class="face back">
         <h4>${t}</h4>
         <p>${d}</p>
-        ${t === 'Compás' ? `<div class="cr" onclick="event.stopPropagation()">
-          <div id="pulsos"></div>
-          <div id="cr-ctl"><button id="cr-play" type="button">▶ Reproducir (90 BPM)</button>
-            <span class="cr-info"><b>F</b> fuerte · <b>D</b> débil · <b>SF</b> semifuerte · el 1 suena más agudo</span></div>
-        </div>` : ''}
+        ${extras[t] || ''}
       </div>
     </div>
   </div>`).join('');
@@ -159,6 +187,57 @@ document.querySelectorAll('.flip').forEach(b => {
     ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
     run = true; beat = 0; next = ac.currentTime + 0.05; btn.textContent = '■ Parar'; plan();
   });
+})();
+
+// ---- Ejemplo de síncopa: 8 corcheas por compás a 90 BPM ----
+(() => {
+  const STEP = 60 / 90 / 2;
+  const pats = [[1,0,1,0,1,0,1,0],[1,0,0,1,0,0,1,0]];
+  const lab = ['1','y','2','y','3','y','4','y'];
+  const textos = [
+    'Sin síncopa: cada golpe cae justo sobre un pulso (1, 2, 3, 4).',
+    'Con síncopa: el golpe del «y» del 2 cae entre pulsos y empuja hacia el 3, que se queda sin golpe. Es el patrón de tresillo: 1 · «y» del 2 · 4.'
+  ];
+  const grid = document.getElementById('sy-grid');
+  grid.innerHTML = lab.map((l,i) => `<div class="paso ${i % 2 ? 'of' : ''}"><span class="n">${l}</span><span class="marca"></span></div>`).join('');
+  const pasos = [...grid.children], btns = [...document.querySelectorAll('.sy-modo')];
+  const play = document.getElementById('sy-play'), info = document.getElementById('sy-info');
+  let modo = 0, ac = null, run = false, idx = 0, next = 0, timer = null;
+  function pintar() {
+    pasos.forEach((p,i) => p.classList.toggle('hit', !!pats[modo][i]));
+    btns.forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.m) === modo));
+    info.textContent = textos[modo];
+  }
+  btns.forEach(b => b.addEventListener('click', () => { modo = Number(b.dataset.m); pintar(); }));
+  const marcar = i => pasos.forEach((p,k) => p.classList.toggle('ahora', k === i));
+  function tick(t) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'triangle'; o.frequency.value = 1300;
+    g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + 0.06);
+  }
+  function golpe(t) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(60, t + 0.16);
+    g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + 0.25);
+  }
+  function plan() {
+    while (next < ac.currentTime + 0.15) {
+      const i = idx;
+      if (i % 2 === 0) tick(next);
+      if (pats[modo][i]) golpe(next);
+      setTimeout(() => { if (run) marcar(i); }, Math.max(0, (next - ac.currentTime) * 1000));
+      next += STEP; idx = (idx + 1) % 8;
+    }
+    timer = setTimeout(plan, 25);
+  }
+  play.addEventListener('click', () => {
+    if (run) { run = false; clearTimeout(timer); marcar(-1); play.textContent = '▶ Escuchar (90 BPM)'; return; }
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
+    run = true; idx = 0; next = ac.currentTime + 0.05; play.textContent = '■ Parar'; plan();
+  });
+  pintar();
 })();
 
 const colores = {intro:'#6c8ebf', estrofa:'#82a66a', estribillo:'#b4531f', puente:'#8a6bb4', coda:'#2a9d8f'};
