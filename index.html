@@ -37,7 +37,14 @@
   #timeline { display:flex; height:46px; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#eee; }
   #timeline div { display:flex; align-items:center; justify-content:center; font-size:.75rem; color:#fff; overflow:hidden; white-space:nowrap; }
   .empty { color:var(--muted); font-style:italic; }
-  iframe { width:100%; border:0; border-radius:12px; }
+  #selector { font:inherit; padding:.4rem .6rem; border:1px solid var(--line); border-radius:8px; background:#fff; margin-bottom:.4rem; }
+  audio { width:100%; margin:.4rem 0; }
+  #wave { position:relative; width:100%; height:170px; background:#fff; border:1px solid var(--line);
+          border-radius:10px; cursor:pointer; overflow:hidden; touch-action:none; }
+  #wave canvas { position:absolute; inset:0; width:100%; height:100%; }
+  #ahora { font-weight:600; margin:.5rem 0 0; }
+  #tip { position:absolute; top:4px; padding:1px 6px; font-size:.75rem; background:#222; color:#fff;
+         border-radius:4px; pointer-events:none; display:none; }
   @media (prefers-reduced-motion: reduce) { .inner { transition:none; } }
 </style>
 </head>
@@ -51,11 +58,14 @@
   <p class="hint">Toca una tarjeta para ver su definición.</p>
   <div class="grid" id="conceptos"></div>
 
-  <h2 id="cancion-titulo">Canción analizada</h2>
-  <iframe id="player" height="152" allow="encrypted-media" loading="lazy"></iframe>
+  <h2 id="cancion-titulo">Canciones analizadas</h2>
+  <select id="selector" aria-label="Elegir canción"></select>
   <p id="meta"></p>
-  <div id="timeline"></div>
+  <div id="wave"><canvas id="cv"></canvas><span id="tip"></span></div>
+  <audio id="audio" controls preload="metadata"></audio>
+  <p id="ahora"></p>
   <p id="aviso" class="empty"></p>
+  <p class="hint">Haz clic en la onda para saltar a ese punto. Las líneas finas marcan compases; las gruesas, cada 8 compases.</p>
 </main>
 <script>
 // [título, pista corta, definición, cómo reconocerlo, ficha, color]
@@ -115,24 +125,82 @@ document.querySelectorAll('.flip').forEach(b => b.addEventListener('click', () =
 const colores = {intro:'#6c8ebf', estrofa:'#82a66a', estribillo:'#b4531f', puente:'#8a6bb4', coda:'#555'};
 const mmss = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 
-fetch('data/o-meu-lugar.json').then(r => r.json()).then(d => {
-  document.getElementById('cancion-titulo').textContent = `${d.titulo} — ${d.artista}`;
-  document.getElementById('player').src = `https://open.spotify.com/embed/track/${d.spotify_track_id}`;
-  document.getElementById('meta').textContent =
-    `Duración ${mmss(d.duracion_s)} · BPM ${d.bpm ?? '?'} · Compás ${d.compas ?? '?'}`;
-  const tl = document.getElementById('timeline');
-  if (!d.secciones.length) {
-    tl.style.display = 'none';
-    document.getElementById('aviso').textContent = 'Línea de tiempo pendiente: faltan las secciones verificadas.';
-    return;
+const CANCIONES = [
+  ['o-meu-lugar', 'O Meu Lugar — 7AL3M'],
+  ['o-vento-traz-o-teu-perfume', 'O vento traz o teu perfume — vjgalaxy']
+];
+const au = document.getElementById('audio'), cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+const wave = document.getElementById('wave'), tip = document.getElementById('tip');
+const sel = document.getElementById('selector');
+sel.innerHTML = CANCIONES.map(([id,t]) => `<option value="${id}">${t}</option>`).join('');
+let d = null, pk = null;
+const dur = () => pk.duracion_s, L = () => d.duracion_compas_s;
+const secAt = t => [...d.secciones].reverse().find(s => t >= s.inicio_s) || d.secciones[0];
+
+function draw() {
+  if (!d) return;
+  const dpr = window.devicePixelRatio || 1, W = wave.clientWidth, H = wave.clientHeight, D = dur();
+  cv.width = W*dpr; cv.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+  const x = t => t / D * W;
+  d.secciones.forEach((s,i) => {
+    const fin = d.secciones[i+1]?.inicio_s ?? D, c = colores[s.tipo] || '#999';
+    ctx.fillStyle = c + '33'; ctx.fillRect(x(s.inicio_s), 0, x(fin) - x(s.inicio_s), H);
+    ctx.fillStyle = c; ctx.fillRect(x(s.inicio_s), 0, 2, H);
+    ctx.font = '600 12px system-ui'; ctx.textBaseline = 'top'; ctx.fillText(s.nombre, x(s.inicio_s) + 5, 4);
+  });
+  for (let n = 1; n*L() < D; n++) {
+    ctx.strokeStyle = n % 8 === 0 ? 'rgba(0,0,0,.35)' : 'rgba(0,0,0,.10)';
+    ctx.lineWidth = n % 8 === 0 ? 1.5 : 1;
+    ctx.beginPath(); ctx.moveTo(x(n*L()), 0); ctx.lineTo(x(n*L()), H); ctx.stroke();
   }
-  tl.innerHTML = d.secciones.map((s,i) => {
-    const fin = (d.secciones[i+1]?.inicio_s) ?? d.duracion_s;
-    const w = (fin - s.inicio_s) / d.duracion_s * 100;
-    const c = colores[s.tipo] || '#999';
-    return `<div style="width:${w}%;background:${c}" title="${s.nombre} (${mmss(s.inicio_s)})">${s.nombre}</div>`;
-  }).join('');
+  const N = pk.max.length, mid = H*0.58, amp = H*0.34;
+  ctx.fillStyle = '#2b2b2b';
+  for (let px = 0; px < W; px++) {
+    const i = Math.min(N-1, Math.floor(px / W * N));
+    const top = mid - pk.max[i]*amp, bot = mid - pk.min[i]*amp;
+    ctx.fillRect(px, top, 1, Math.max(1, bot - top));
+  }
+  ctx.fillStyle = '#e11'; ctx.fillRect(x(au.currentTime) - 1, 0, 2, H);
+}
+function actualizar() {
+  if (!d) return;
+  const s = secAt(au.currentTime), c = Math.floor(au.currentTime / L()) + 1;
+  document.getElementById('ahora').textContent = `${mmss(Math.floor(au.currentTime))} · ${s.nombre} · compás ${c}`;
+  draw();
+}
+const tick = () => { actualizar(); if (!au.paused) requestAnimationFrame(tick); };
+au.addEventListener('play', tick);
+['pause','seeked','timeupdate','loadedmetadata'].forEach(e => au.addEventListener(e, actualizar));
+au.addEventListener('error', () => {
+  if (d) document.getElementById('aviso').textContent =
+    `No se encuentra el audio (${d.audio}). Copia el mp3 en esa ruta para poder reproducirlo.`;
 });
+window.addEventListener('resize', draw);
+const tDe = ev => Math.max(0, Math.min(dur(), (ev.clientX - wave.getBoundingClientRect().left) / wave.clientWidth * dur()));
+wave.addEventListener('click', ev => { if (d) au.currentTime = tDe(ev); });
+wave.addEventListener('mousemove', ev => {
+  if (!d) return; const t = tDe(ev); tip.style.display = 'block';
+  tip.style.left = Math.min(wave.clientWidth - 60, ev.clientX - wave.getBoundingClientRect().left + 8) + 'px';
+  tip.textContent = `${mmss(Math.floor(t))} · c.${Math.floor(t / L()) + 1}`;
+});
+wave.addEventListener('mouseleave', () => tip.style.display = 'none');
+
+function cargar(id) {
+  au.pause();
+  Promise.all([fetch(`data/${id}.json`).then(r => r.json()), fetch(`data/${id}-peaks.json`).then(r => r.json())])
+  .then(([dd, pp]) => {
+    d = dd; pk = pp;
+    document.getElementById('aviso').textContent = '';
+    document.getElementById('meta').innerHTML =
+      `Duración ${mmss(Math.round(dur()))} · ${d.bpm} BPM · Compás ${d.compas} · ` +
+      `<a href="${d.enlace}" target="_blank" rel="noopener">ver origen</a>` +
+      (d.credito ? `<br><small>${d.credito}</small>` : '');
+    au.src = d.audio; au.currentTime = 0;
+    actualizar();
+  });
+}
+sel.addEventListener('change', () => cargar(sel.value));
+cargar(CANCIONES[0][0]);
 </script>
 </body>
 </html>
