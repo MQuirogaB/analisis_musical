@@ -59,7 +59,7 @@
   <div class="grid" id="conceptos"></div>
 
   <h2 id="cancion-titulo">Canciones analizadas</h2>
-  <select id="selector" aria-label="Elegir canción"></select>
+  <select id="selector" aria-label="Elegir canción" hidden></select>
   <p id="meta"></p>
   <div id="wave"><canvas id="cv"></canvas><span id="tip"></span></div>
   <audio id="audio" controls preload="metadata"></audio>
@@ -126,7 +126,6 @@ const colores = {intro:'#6c8ebf', estrofa:'#82a66a', estribillo:'#b4531f', puent
 const mmss = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 
 const CANCIONES = [
-  ['o-meu-lugar', 'O Meu Lugar — 7AL3M'],
   ['o-vento-traz-o-teu-perfume', 'O vento traz o teu perfume — vjgalaxy']
 ];
 const au = document.getElementById('audio'), cv = document.getElementById('cv'), ctx = cv.getContext('2d');

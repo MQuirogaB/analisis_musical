@@ -1,5 +1,5 @@
 """Calcula la forma de onda (picos mín/máx) de un mp3 y la guarda como JSON.
-Uso: python3 tools/peaks.py audio/o-meu-lugar.mp3 data/o-meu-lugar-peaks.json
+Uso: python3 tools/peaks.py audio/o-vento-traz-o-teu-perfume.mp3 data/o-vento-traz-o-teu-perfume-peaks.json
 Requiere ffmpeg y numpy."""
 import subprocess, sys, json, numpy as np
 src, out = sys.argv[1], sys.argv[2]

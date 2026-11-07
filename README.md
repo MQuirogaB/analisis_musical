@@ -13,9 +13,8 @@ Material de clase para aprender a **escuchar la estructura de una canción** y d
 | Puente | ¿Dónde cambia el paisaje a mitad de canción? | [docs/06-puente.md](docs/06-puente.md) |
 | Coda | ¿Cómo se cierra la canción? | [docs/07-coda.md](docs/07-coda.md) |
 
-## Canciones analizadas
+## Canción analizada
 
-- **O Meu Lugar** — 7AL3M (2025, 3:30), 97 BPM. [Análisis](analisis/o-meu-lugar.md)
 - **O vento traz o teu perfume** — vjgalaxy / Alejandro Piñero Amerio (Pixabay, 3:07), 90 BPM. [Análisis](analisis/o-vento-traz-o-teu-perfume.md)
 
 Música de la segunda canción: Alejandro Piñero Amerio, de [Pixabay](https://pixabay.com/music/) (Pixabay Content License).
@@ -29,13 +28,12 @@ Música de la segunda canción: Alejandro Piñero Amerio, de [Pixabay](https://p
 
 ## Web
 
-`index.html` es una página estática (sin dependencias) que muestra los conceptos y la línea de tiempo de la canción a partir de `data/o-meu-lugar.json`. Para verla en local: `python3 -m http.server` dentro de esta carpeta y abrir `http://localhost:8000`.
+`index.html` es una página estática (sin dependencias) que muestra los conceptos y la línea de tiempo de la canción a partir de `data/o-vento-traz-o-teu-perfume.json`. Para verla en local: `python3 -m http.server` dentro de esta carpeta y abrir `http://localhost:8000`.
 
 ## Estado
 
 - [x] Fichas de teoría
 - [x] Plantilla de análisis
-- [x] Mapa de secciones, tempo (≈ 97 BPM) y compases de *O Meu Lugar* (medido sobre el audio)
 - [x] Mapa de secciones, tempo (90 BPM) y compases de *O vento traz o teu perfume*
 - [ ] Confirmar al oído qué bloques son estrofa / estribillo y si hay anacrusa en la voz
 
@@ -44,4 +42,3 @@ Música de la segunda canción: Alejandro Piñero Amerio, de [Pixabay](https://p
 Los mp3 están en `audio/` y la web los reproduce directamente. La forma de onda (`data/*-peaks.json`) se genera con `tools/peaks.py`.
 
 - *O vento traz o teu perfume*: Alejandro Piñero Amerio, de [Pixabay](https://pixabay.com/music/) (Pixabay Content License).
-- *O Meu Lugar* (7AL3M): incluida con fines didácticos en clase.

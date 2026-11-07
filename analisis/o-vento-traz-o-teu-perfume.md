@@ -28,7 +28,7 @@ Los cambios importantes llegan casi siempre tras un **compás aligerado** (hacia
 - **Frase y bloque:** lo natural es la frase de 4 compases (≈ 10,7 s) y el bloque de 8. El bloque B (12 compases) y el E (17) rompen la regla y son buenos ejemplos de «bloques irregulares».
 - **Intro:** 8 compases; los 4 primeros, sin bajo.
 - **Puente:** 1:57–2:19. El bajo desaparece y la música se aligera; es el contraste más claro.
-- **Coda:** corta y rotunda (no se apaga lentamente como en *O Meu Lugar*). Ideal para comparar los dos tipos de final.
+- **Coda:** corta y rotunda: cierra con un golpe final en lugar de apagarse poco a poco (fade-out).
 - **Síncopa:** el bajo carga sus golpes **entre pulsos** y deja huecos regulares en dos de los cuatro pulsos del compás. Es la base sincopada típica de la kizomba. *Para comprobar:* marca el pulso con el pie y el bajo con la mano.
 - **Anacrusa:** *por confirmar.* Revisa las entradas de la voz.
 
