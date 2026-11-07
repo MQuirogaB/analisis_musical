@@ -46,21 +46,22 @@
   #tip { position:absolute; top:4px; padding:1px 6px; font-size:.75rem; background:#222; color:#fff;
          border-radius:4px; pointer-events:none; display:none; }
 
-  /* Caja de ritmos */
-  #caja-box { background:#fff; border:1px solid var(--line); border-radius:16px; padding:1.1rem; }
-  #pulsos { display:flex; gap:.7rem; align-items:flex-end; height:150px; }
-  .pulso { flex:1; border-radius:12px; background:#e9e2d4; color:#555; display:flex; flex-direction:column;
-           align-items:center; justify-content:flex-end; padding:.5rem; transition:background .08s, transform .08s, color .08s; }
-  .pulso b { font-size:1.6rem; line-height:1; } .pulso small { font-size:.8rem; margin-top:.2rem; }
+  /* Tarjeta ancha (Compás) con caja de ritmos */
+  .flip.wide.on { grid-column:1 / -1; height:480px; }
+  .wide .back { font-size:1.05rem; }
+  .wide .cr { margin-top:.6rem; flex:1; display:flex; flex-direction:column; gap:.8rem; min-height:0; cursor:default; }
+  #pulsos { display:flex; gap:.8rem; align-items:flex-end; flex:1; min-height:150px; }
+  .pulso { flex:1; border-radius:14px; background:#e9e2d4; color:#555; display:flex; flex-direction:column;
+           align-items:center; justify-content:flex-end; padding:.6rem; transition:background .08s, transform .08s, color .08s; }
+  .pulso b { font-size:2.2rem; line-height:1; } .pulso small { font-size:.85rem; margin-top:.3rem; text-align:center; }
   .pulso.f { height:100%; } .pulso.sf { height:72%; } .pulso.d { height:48%; }
   .pulso.on { background:#2f6f8f; color:#fff; transform:scale(1.04); }
   .pulso.f.on { background:#b4531f; }
-  #cr-ctl { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-top:1rem; }
-  #cr-play { font:inherit; font-weight:600; padding:.55rem 1.4rem; border:0; border-radius:999px;
-             background:var(--accent); color:#fff; cursor:pointer; }
+  #cr-ctl { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
+  #cr-play { font:inherit; font-weight:600; padding:.6rem 1.6rem; border:0; border-radius:999px;
+             background:var(--c); color:#fff; cursor:pointer; }
   #cr-play:focus-visible { outline:3px solid #222; outline-offset:2px; }
-  #cr-ctl label { display:flex; gap:.6rem; align-items:center; flex:1; min-width:220px; }
-  #cr-bpm { flex:1; }
+  .cr-info { color:var(--muted); font-size:.85rem; }
   @media (prefers-reduced-motion: reduce) { .inner { transition:none; } }
 </style>
 </head>
@@ -73,16 +74,6 @@
   <h2>Conceptos</h2>
   <p class="hint">Toca una tarjeta para ver su definición.</p>
   <div class="grid" id="conceptos"></div>
-
-  <h2 id="caja">Caja de ritmos · compás 4/4</h2>
-  <p class="hint">Un compás = 4 pulsos. <b>F</b> fuerte · <b>D</b> débil · <b>SF</b> semifuerte. El 1 suena más agudo.</p>
-  <div id="caja-box">
-    <div id="pulsos"></div>
-    <div id="cr-ctl">
-      <button id="cr-play" type="button">▶ Reproducir</button>
-      <label>BPM <input id="cr-bpm" type="range" min="50" max="140" value="90"> <output id="cr-bpm-v">90</output></label>
-    </div>
-  </div>
 
   <h2 id="cancion-titulo">Canciones analizadas</h2>
   <select id="selector" aria-label="Elegir canción" hidden></select>
@@ -114,7 +105,7 @@ const conceptos = [
    "Sección que cierra la canción tras la última repetición del material principal.","#555e6b"]
 ];
 document.getElementById('conceptos').innerHTML = conceptos.map(([t,p,d,c],i) => `
-  <button class="flip" style="--c:${c}" aria-pressed="false" aria-label="${t}: tocar para voltear">
+  <div class="flip${t === 'Compás' ? ' wide' : ''}" style="--c:${c}" role="button" tabindex="0" aria-pressed="false" aria-label="${t}: tocar para voltear">
     <div class="inner">
       <div class="face front">
         <span class="num">${String(i+1).padStart(2,'0')}</span>
@@ -123,22 +114,29 @@ document.getElementById('conceptos').innerHTML = conceptos.map(([t,p,d,c],i) => 
       <div class="face back">
         <h4>${t}</h4>
         <p>${d}</p>
-        ${t === 'Compás' ? '<a href="#caja" onclick="event.stopPropagation()">Probar en la caja de ritmos ↓</a>' : ''}
+        ${t === 'Compás' ? `<div class="cr" onclick="event.stopPropagation()">
+          <div id="pulsos"></div>
+          <div id="cr-ctl"><button id="cr-play" type="button">▶ Reproducir (90 BPM)</button>
+            <span class="cr-info"><b>F</b> fuerte · <b>D</b> débil · <b>SF</b> semifuerte · el 1 suena más agudo</span></div>
+        </div>` : ''}
       </div>
     </div>
-  </button>`).join('');
-document.querySelectorAll('.flip').forEach(b => b.addEventListener('click', () => {
-  const on = b.classList.toggle('on'); b.setAttribute('aria-pressed', on);
-}));
+  </div>`).join('');
+document.querySelectorAll('.flip').forEach(b => {
+  const voltear = () => { const on = b.classList.toggle('on'); b.setAttribute('aria-pressed', on); };
+  b.addEventListener('click', voltear);
+  b.addEventListener('keydown', e => {
+    if (e.target === b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); voltear(); }
+  });
+});
 
-// ---- Caja de ritmos 4/4 (sonido sintetizado con Web Audio) ----
+// ---- Caja de ritmos 4/4 a 90 BPM (sonido sintetizado con Web Audio) ----
 (() => {
+  const BPM = 90;
   const defs = [['1','Fuerte','F','f'],['2','Débil','D','d'],['3','Semifuerte','SF','sf'],['4','Débil','D','d']];
   const cont = document.getElementById('pulsos');
   cont.innerHTML = defs.map(([n,nom,ab,cl]) => `<div class="pulso ${cl}"><b>${n}</b><small>${ab} · ${nom}</small></div>`).join('');
   const cajas = [...cont.children], btn = document.getElementById('cr-play');
-  const bpmEl = document.getElementById('cr-bpm'), bpmV = document.getElementById('cr-bpm-v');
-  bpmEl.addEventListener('input', () => bpmV.textContent = bpmEl.value);
   let ac = null, run = false, beat = 0, next = 0, timer = null;
   const marcar = i => cajas.forEach((c,k) => c.classList.toggle('on', k === i));
   function clic(t, b) {
@@ -152,12 +150,12 @@ document.querySelectorAll('.flip').forEach(b => b.addEventListener('click', () =
     while (next < ac.currentTime + 0.15) {
       const b = beat; clic(next, b);
       setTimeout(() => { if (run) marcar(b); }, Math.max(0, (next - ac.currentTime) * 1000));
-      next += 60 / Number(bpmEl.value); beat = (beat + 1) % 4;
+      next += 60 / BPM; beat = (beat + 1) % 4;
     }
     timer = setTimeout(plan, 25);
   }
   btn.addEventListener('click', () => {
-    if (run) { run = false; clearTimeout(timer); marcar(-1); btn.textContent = '▶ Reproducir'; return; }
+    if (run) { run = false; clearTimeout(timer); marcar(-1); btn.textContent = '▶ Reproducir (90 BPM)'; return; }
     ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
     run = true; beat = 0; next = ac.currentTime + 0.05; btn.textContent = '■ Parar'; plan();
   });
