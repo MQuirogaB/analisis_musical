@@ -3,12 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <title>Musicalidad para bailarines</title>
 <style>
-  :root { --bg:#faf7f2; --fg:#222; --muted:#6b6b6b; --accent:#b4531f; --line:#e6dfd3; }
+  :root { --bg:#f3ecdd; --fg:#2b2a28; --muted:#6b665c; --accent:#9c3d2e; --line:#ddd2bb; --card:#fbf7ee; --hf:"Playfair Display", Georgia, serif; --bf:"Inter", system-ui, sans-serif; }
   * { box-sizing: border-box; }
-  body { margin:0; font:16px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+  body { margin:0; font:16px/1.5 var(--bf); background:var(--bg); color:var(--fg); }
   header, main { max-width: 960px; margin: 0 auto; padding: 1.2rem; }
+  h1, h2, h3, h4 { font-family:var(--hf); font-weight:700; }
   h1 { margin-bottom:.2rem; } .sub { color:var(--muted); margin-top:0; }
   h2 { color:var(--accent); margin-top:2.2rem; }
   .hint { color:var(--muted); font-size:.9rem; margin-top:-.4rem; }
@@ -17,18 +21,19 @@
   .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:1rem; }
   .flip { perspective:1000px; background:none; border:0; padding:0; cursor:pointer; text-align:left;
           font:inherit; color:inherit; height:250px; }
-  .flip:focus-visible { outline:3px solid var(--accent); outline-offset:3px; border-radius:16px; }
+  .flip:focus-visible { outline:3px solid var(--accent); outline-offset:3px; border-radius:6px; }
   .inner { position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d; }
   .flip.on .inner { transform:rotateY(180deg); }
   .face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
-          border-radius:16px; padding:1.1rem; display:flex; flex-direction:column; overflow:auto;
+          border-radius:6px; padding:1.1rem; display:flex; flex-direction:column; overflow:auto;
           box-shadow:0 2px 8px rgba(0,0,0,.12); }
   .front { background:var(--c); color:#fff; align-items:center; justify-content:center; text-align:center; }
   .front .num { font-size:.8rem; opacity:.8; letter-spacing:.1em; }
+  .front svg { display:block; margin:.5rem 0 .2rem; }
   .front h3 { margin:.3rem 0; font-size:1.5rem; }
   .front p { margin:0; opacity:.92; font-size:.95rem; }
   .front .tap { margin-top:1rem; font-size:.75rem; opacity:.75; }
-  .back { background:#fff; border:2px solid var(--c); transform:rotateY(180deg); font-size:.9rem; }
+  .back { background:var(--card); border:2px solid var(--c); transform:rotateY(180deg); font-size:.9rem; }
   .back h4 { margin:0 0 .4rem; color:var(--c); }
   .back p { margin:.2rem 0 .5rem; }
   .back b { color:var(--c); }
@@ -110,22 +115,37 @@
 // [título, pista corta, definición, color]
 const conceptos = [
   ["Compás","¿Cómo se agrupan los pulsos?",
-   "Forma en que se agrupan los pulsos en ciclos que se repiten. En zouk y kizomba lo habitual es el 4/4.","#2f6f8f"],
+   "Forma en que se agrupan los pulsos en ciclos que se repiten. En zouk y kizomba lo habitual es el 4/4.","#264653"],
   ["Anacrusa","Lo que suena antes del 1",
-   "Nota, notas o voz que suenan antes del primer tiempo fuerte: una toma de impulso que aterriza en el 1.","#c0562b"],
+   "Nota, notas o voz que suenan antes del primer tiempo fuerte: una toma de impulso que aterriza en el 1.","#9c3d2e"],
   ["Síncopa","Acento donde no se espera",
-   "Acento en un tiempo débil o entre tiempos que se alarga sobre el siguiente fuerte, que queda sin golpe.","#8a4fb0"],
+   "Acento en un tiempo débil o entre tiempos que se alarga sobre el siguiente fuerte, que queda sin golpe.","#6b4a7a"],
   ["Frase musical","Una idea con principio y cierre",
-   "Unidad de sentido con principio, desarrollo y cierre. En esta música suele ocupar 2 compases, y varias frases forman un bloque.","#2e8b57"],
+   "Unidad de sentido con principio, desarrollo y cierre. En esta música suele ocupar 2 compases, y varias frases forman un bloque.","#4a6b3f"],
   ["Bloque musical","Frases que forman una unidad",
-   "Agrupación de, habitualmente, 4 frases con sentido propio dentro de la canción.","#c28a00"],
+   "Agrupación de, habitualmente, 4 frases con sentido propio dentro de la canción.","#a47a1a"],
   ["Intro","Cómo arranca la canción",
-   "Parte inicial de la canción, suele presentar los instrumentos y ser más suave.","#3a7ca5"],
+   "Parte inicial de la canción, suele presentar los instrumentos y ser más suave.","#2f5d7c"],
   ["Puente","El cambio de paisaje",
-   "Bloque de, habitualmente, 2 o 4 frases que une otros dos bloques y da algo de aire entre ellos.","#b5446e"],
+   "Bloque de, habitualmente, 2 o 4 frases que une otros dos bloques y da algo de aire entre ellos.","#8a3b55"],
   ["Coda","El cierre final",
-   "Parte final de la canción, sirve para finalizarla.","#555e6b"]
+   "Parte final de la canción, sirve para finalizarla.","#3d6b66"]
 ];
+const kinds = ['4','ana','sync','frase','bloque','intro','puente','coda'];
+function glyph(k, s=1) {
+  const W=120*s, H=40*s, cs=(x,y,r,o=1)=>`<circle cx="${x*s}" cy="${y*s}" r="${r*s}" fill="currentColor" opacity="${o}"/>`;
+  let b='';
+  if(k==='4') b=cs(14,20,9)+cs(46,20,5,.6)+cs(78,20,7,.8)+cs(108,20,5,.6);
+  else if(k==='ana') b=cs(10,26,4,.7)+cs(26,26,4,.7)+`<line x1="${44*s}" y1="${4*s}" x2="${44*s}" y2="${36*s}" stroke="currentColor" stroke-width="${2*s}"/>`+cs(66,20,10)+cs(100,20,5,.6);
+  else if(k==='sync') b=cs(14,20,8)+cs(46,20,5,.45)+cs(62,20,8,.9)+cs(94,20,5,.45)+`<path d="M${62*s} ${8*s} Q${78*s} ${-2*s} ${94*s} ${8*s}" fill="none" stroke="currentColor" stroke-width="${1.6*s}"/>`;
+  else if(k==='frase') b=`<path d="M${8*s} ${30*s} Q${60*s} ${-8*s} ${112*s} ${30*s}" fill="none" stroke="currentColor" stroke-width="${3*s}" stroke-linecap="round"/>`+cs(8,30,5)+cs(112,30,5);
+  else if(k==='bloque') b=[0,1,2,3].map(i=>`<rect x="${(8+i*28)*s}" y="${10*s}" width="${22*s}" height="${20*s}" rx="${4*s}" fill="currentColor" opacity="${.45+i*.18}"/>`).join('');
+  else if(k==='intro') b=`<rect x="${6*s}" y="${22*s}" width="${108*s}" height="${3*s}" fill="currentColor" opacity=".4"/>`+cs(14,23,8)+cs(40,23,4,.6);
+  else if(k==='puente') b=`<path d="M${8*s} ${32*s} L${8*s} ${16*s} Q${60*s} ${-6*s} ${112*s} ${16*s} L${112*s} ${32*s}" fill="none" stroke="currentColor" stroke-width="${3*s}" stroke-linecap="round"/>`;
+  else b=`<rect x="${8*s}" y="${10*s}" width="${70*s}" height="${20*s}" rx="${4*s}" fill="currentColor" opacity=".6"/><rect x="${86*s}" y="${10*s}" width="${8*s}" height="${20*s}" rx="${3*s}" fill="currentColor"/>`;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${b}</svg>`;
+}
+const ROM = ['I','II','III','IV','V','VI','VII','VIII'];
 const extras = {
   'Compás': `<div class="cr" onclick="event.stopPropagation()">
       <div id="pulsos"></div>
@@ -156,7 +176,8 @@ document.getElementById('conceptos').innerHTML = conceptos.map(([t,p,d,c],i) => 
   <div class="flip${extras[t] ? ' wide' : ''}${t === 'Anacrusa' ? ' tall' : ''}" style="--c:${c}" role="button" tabindex="0" aria-pressed="false" aria-label="${t}: tocar para voltear">
     <div class="inner">
       <div class="face front">
-        <span class="num">${String(i+1).padStart(2,'0')}</span>
+        <span class="num">${ROM[i]}</span>
+        ${glyph(kinds[i],1.2)}
         <h3>${t}</h3><p>${p}</p><span class="tap">toca para voltear ↻</span>
       </div>
       <div class="face back">
