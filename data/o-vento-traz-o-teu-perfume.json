@@ -8,15 +8,62 @@
   "audio": "audio/o-vento-traz-o-teu-perfume.mp3",
   "enlace": "https://pixabay.com/es/music/m%C3%BAsica-pop-o-vento-traz-o-teu-perfume-kizomba-music-436764/",
   "credito": "Music by <a href=\"https://pixabay.com/es/users/vjgalaxy-8110364/\" target=\"_blank\" rel=\"noopener\">Alejandro Piñero Amerio</a> from <a href=\"https://pixabay.com/music/\" target=\"_blank\" rel=\"noopener\">Pixabay</a> (Pixabay Content License)",
-  "nota": "Secciones obtenidas del análisis del audio (energía y timbre). Tiempos con margen de ±0,5 s. Los nombres estrofa/estribillo están por confirmar escuchando.",
+  "nota": "Secciones medidas sobre el audio (energía y timbre) y ajustadas por el profesor al oído. Una frase = 2 compases (≈5,3 s). Tiempos con margen de ±0,5 s.",
   "secciones": [
-    { "nombre": "Intro", "tipo": "intro", "inicio_s": 0, "compases": 8 },
-    { "nombre": "Bloque A", "tipo": "estrofa", "inicio_s": 21, "compases": 8 },
-    { "nombre": "Bloque B", "tipo": "estribillo", "inicio_s": 43, "compases": 12 },
-    { "nombre": "Bloque C", "tipo": "estrofa", "inicio_s": 75, "compases": 8 },
-    { "nombre": "Bloque D", "tipo": "estribillo", "inicio_s": 96, "compases": 8 },
-    { "nombre": "Puente", "tipo": "puente", "inicio_s": 117, "compases": 8 },
-    { "nombre": "Bloque E", "tipo": "estribillo", "inicio_s": 139, "compases": 17 },
-    { "nombre": "Coda", "tipo": "coda", "inicio_s": 184, "compases": 1 }
-  ]
+    {
+      "nombre": "Intro",
+      "tipo": "intro",
+      "inicio_s": 0,
+      "frases": 4
+    },
+    {
+      "nombre": "Bloque A",
+      "tipo": "estrofa",
+      "inicio_s": 21.33,
+      "frases": 4
+    },
+    {
+      "nombre": "B · Estribillo",
+      "tipo": "estribillo",
+      "inicio_s": 42.66,
+      "frases": 4
+    },
+    {
+      "nombre": "Puente 1",
+      "tipo": "puente",
+      "inicio_s": 63.98,
+      "frases": 2
+    },
+    {
+      "nombre": "Bloque C",
+      "tipo": "estrofa",
+      "inicio_s": 74.65,
+      "frases": 4
+    },
+    {
+      "nombre": "B · Estribillo",
+      "tipo": "estribillo",
+      "inicio_s": 95.98,
+      "frases": 4
+    },
+    {
+      "nombre": "Puente 2",
+      "tipo": "puente",
+      "inicio_s": 117.3,
+      "frases": 4,
+      "nota": "termina con un compás de parada"
+    },
+    {
+      "nombre": "B · Estribillo final",
+      "tipo": "estribillo",
+      "inicio_s": 141.3,
+      "frases": 8
+    },
+    {
+      "nombre": "Coda",
+      "tipo": "coda",
+      "inicio_s": 183.95
+    }
+  ],
+  "frase_s": 5.332
 }

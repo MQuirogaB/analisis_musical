@@ -3,45 +3,51 @@
 **Datos:** duración 3:07 · kizomba con voz · [Pixabay](https://pixabay.com/es/music/m%C3%BAsica-pop-o-vento-traz-o-teu-perfume-kizomba-music-436764/)
 Music by [Alejandro Piñero Amerio](https://pixabay.com/es/users/vjgalaxy-8110364/) from [Pixabay](https://pixabay.com/music/) (Pixabay Content License).
 
-**Tempo:** **90 BPM** · **Compás:** 4/4 · **Duración de un compás:** ≈ 2,67 s (frase de 4 compases ≈ 10,7 s; bloque de 8 compases ≈ 21,3 s)
+**Tempo:** **90 BPM** · **Compás:** 4/4 (≈ 2,67 s) · **Frase = 2 compases ≈ 5,3 s** · **Bloque de 4 frases = 8 compases ≈ 21,3 s**
 
-> **Cómo se obtuvo.** Análisis automático del audio (rejilla de compases, energía por bandas de frecuencia). Es fiable para **cuándo** cambia la música y **cuántos compases** dura cada parte; los nombres estrofa / estribillo hay que confirmarlos escuchando. Tiempos con margen de ±0,5 s.
+> **Cómo se obtuvo.** Medición automática sobre el audio (rejilla de compases, energía por bandas), revisada y corregida al oído por el profesor. Tiempos con margen de ±0,5 s.
 
-## 1. Mapa de la canción
+## 1. Mapa de la canción (en frases)
 
-| # | Sección | Inicio | Compases | Qué ocurre (medido) |
+| # | Sección | Inicio | Frases | Qué ocurre |
 |---|---|---|---|---|
-| 1 | **Intro** | 0:00 | 8 | Los primeros 4 compases suenan sin bajo; el bajo asoma en el compás 5 y se asienta hacia el compás 7 |
-| 2 | **Bloque A** (estrofa ¿?) | 0:21 | 8 | Groove completo; el último compás se aligera antes del siguiente bloque |
-| 3 | **Bloque B** (estribillo ¿?) | 0:43 | 12 | Sube la energía en agudos; después se relaja poco a poco |
-| 4 | **Bloque C** (estrofa ¿?) | 1:15 | 8 | Energía media; el último compás se vacía casi del todo |
-| 5 | **Bloque D** (estribillo ¿?) | 1:36 | 8 | El tramo más intenso hasta ahora |
-| 6 | **Puente** | 1:57 | 8 | **Desaparece el bajo** durante 4 compases; vuelve y se construye hacia el final del puente |
-| 7 | **Bloque E** (estribillo final ¿?) | 2:19 | 17 | Empieza con **un compás de parada** y arranca con la máxima energía de la canción |
-| 8 | **Coda** | 3:04 | ≈ 1 | Golpe final y cierre rápido (≈ 3:07) |
+| 1 | **Intro** | 0:00 | 4 | Las 2 primeras frases suenan sin bajo; el bajo asoma en la tercera y se asienta |
+| 2 | **Bloque A** | 0:21 | 4 | Groove completo; la última frase se aligera antes del estribillo |
+| 3 | **Bloque B · Estribillo** | 0:43 | 4 | Sube la energía, sobre todo en los agudos |
+| 4 | **Puente 1** | 1:04 | 2 | Puente corto de 2 frases: la energía baja y enlaza con el bloque C |
+| 5 | **Bloque C** | 1:15 | 4 | Energía media; la última frase se vacía casi del todo |
+| 6 | **Bloque B · Estribillo** | 1:36 | 4 | Vuelve el estribillo (mismo material que el primero), con más intensidad |
+| 7 | **Puente 2** | 1:57 | 4 | **Desaparece el bajo** durante 2 frases; vuelve y se construye. Termina con un compás de parada |
+| 8 | **Bloque B · Estribillo final** | 2:21 | 8 | Entra el estribillo por última vez, con la máxima energía de la canción |
+| 9 | **Coda** | 3:04 | — | Golpe final y cierre seco (≈ 3:07) |
 
-Los cambios importantes llegan casi siempre tras un **compás aligerado** (hacia 0:40, 1:33 y 2:16), lo que ayuda a anticiparlos al bailar.
+Total: **34 frases** + parada + coda. Excepto el estribillo final (8 frases), todos los bloques tienen 4 frases; los puentes son de 2 y de 4.
+
+*(El estribillo final se mide a las 2:21; si lo oyes entrar a las 2:22, es el compás de parada que lo precede.)*
 
 ## 2. Los conceptos en esta canción
 
-- **Compás:** 4/4 a 90 BPM.
-- **Frase y bloque:** lo natural es la frase de 4 compases (≈ 10,7 s) y el bloque de 8. El bloque B (12 compases) y el E (17) rompen la regla y son buenos ejemplos de «bloques irregulares».
-- **Intro:** 8 compases; los 4 primeros, sin bajo.
-- **Puente:** 1:57–2:19. El bajo desaparece y la música se aligera; es el contraste más claro.
+- **Frase y bloque:** la frase mide 2 compases y el bloque, 4 frases. Es una estructura muy regular, ideal para enseñar a contar frases en lugar de tiempos.
+- **Estribillo recurrente:** el bloque B reaparece a 1:36 y a 2:21; sirve para practicar el reconocimiento de material repetido.
+- **Puente corto vs puente largo:** Puente 1 (2 frases) enlaza; Puente 2 (4 frases, sin bajo) contrasta de verdad.
+- **Intro:** 4 frases; las 2 primeras, sin bajo.
 - **Coda:** corta y rotunda: cierra con un golpe final en lugar de apagarse poco a poco (fade-out).
-- **Síncopa:** el bajo carga sus golpes **entre pulsos** y deja huecos regulares en dos de los cuatro pulsos del compás. Es la base sincopada típica de la kizomba. *Para comprobar:* marca el pulso con el pie y el bajo con la mano.
+- **Síncopa:** el bajo carga sus golpes **entre pulsos** y deja huecos regulares en dos de los cuatro pulsos del compás. *Para comprobar:* marca el pulso con el pie y el bajo con la mano.
 - **Anacrusa:** *por confirmar.* Revisa las entradas de la voz.
 
-## 3. Lectura para bailar
+## 3. Para bailar
 
-- **0:00–0:21:** escuchar, encontrar el pulso (sin bajo al principio).
-- **0:21–1:57:** cuatro bloques de energía creciente; dosificar.
-- **1:57–2:19 (puente):** sin bajo, momento para suspender.
-- **2:16–2:21:** parada de un compás y estallido final.
-- **2:19–3:04:** 17 compases de máxima energía; administrarlos.
-- **3:04:** cierre seco, preparar el final.
+- **0:00–0:21:** escuchar y encontrar el pulso (sin bajo al principio).
+- **0:21–0:43:** bloque A, construir con calma.
+- **0:43–1:04:** primer estribillo.
+- **1:04–1:15:** puente corto, momento para respirar.
+- **1:15–1:36:** bloque C.
+- **1:36–1:57:** el estribillo vuelve.
+- **1:57–2:21:** puente largo, sin bajo; la parada final anuncia la entrada del estribillo.
+- **2:21–3:04:** 8 frases de estribillo a máxima energía; administrarlas.
+- **3:04:** cierre seco.
 
 ## 4. Pendiente de confirmar al oído
 
-1. Qué bloques son estrofa y cuáles estribillo.
-2. Si hay anacrusa en las entradas de voz.
+1. Si hay anacrusa en las entradas de voz.
+2. Si el estribillo final se divide en dos vueltas de 4 frases (probable por la estructura, no comprobado).
