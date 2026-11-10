@@ -146,6 +146,26 @@ function glyph(k, s=1) {
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${b}</svg>`;
 }
 const ROM = ['I','II','III','IV','V','VI','VII','VIII'];
+// En iPhone el sonido sintetizado (Web Audio) queda mudo con el interruptor de silencio
+// salvo que el navegador esté en modo "reproducción". Se activa así:
+let _silencio = null;
+function nuevoAC() {
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+  try {
+    if (!_silencio) {
+      // WAV mudo de 0,1 s en bucle: al reproducirlo, iOS trata la página como reproductor de audio
+      const n = 800, b = new DataView(new ArrayBuffer(44 + n*2));
+      const w = (o, t) => [...t].forEach((c, i) => b.setUint8(o + i, c.charCodeAt(0)));
+      w(0,'RIFF'); b.setUint32(4, 36 + n*2, true); w(8,'WAVEfmt '); b.setUint32(16,16,true); b.setUint16(20,1,true);
+      b.setUint16(22,1,true); b.setUint32(24,8000,true); b.setUint32(28,16000,true); b.setUint16(32,2,true);
+      b.setUint16(34,16,true); w(36,'data'); b.setUint32(40, n*2, true);
+      _silencio = new Audio(URL.createObjectURL(new Blob([b], {type:'audio/wav'})));
+      _silencio.loop = true; _silencio.setAttribute('playsinline', '');
+    }
+    _silencio.play().catch(() => {});
+  } catch (e) {}
+  return new (window.AudioContext || window.webkitAudioContext)();
+}
 const extras = {
   'Compás': `<div class="cr" onclick="event.stopPropagation()">
       <div id="pulsos"></div>
@@ -221,7 +241,7 @@ document.querySelectorAll('.flip').forEach(b => {
   }
   btn.addEventListener('click', () => {
     if (run) { run = false; clearTimeout(timer); marcar(-1); btn.textContent = '▶ Reproducir (90 BPM)'; return; }
-    ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
+    ac = ac || nuevoAC(); ac.resume();
     run = true; beat = 0; next = ac.currentTime + 0.05; btn.textContent = '■ Parar'; plan();
   });
 })();
@@ -271,7 +291,7 @@ document.querySelectorAll('.flip').forEach(b => {
   }
   play.addEventListener('click', () => {
     if (run) { run = false; clearTimeout(timer); marcar(-1); play.textContent = '▶ Escuchar (90 BPM)'; return; }
-    ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
+    ac = ac || nuevoAC(); ac.resume();
     run = true; idx = 0; next = ac.currentTime + 0.05; play.textContent = '■ Parar'; plan();
   });
   pintar();
@@ -330,7 +350,7 @@ document.querySelectorAll('.flip').forEach(b => {
   }
   play.addEventListener('click', () => {
     if (run) { run = false; clearTimeout(timer); marcar(-1); play.textContent = '▶ Escuchar (90 BPM)'; return; }
-    ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
+    ac = ac || nuevoAC(); ac.resume();
     run = true; idx = 0; next = ac.currentTime + 0.05; play.textContent = '■ Parar'; plan();
   });
   pintar();
